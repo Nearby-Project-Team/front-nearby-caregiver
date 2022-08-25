@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:front_nearby_caregiver/component/chat_message.dart';
-import 'package:front_nearby_caregiver/pages/auth_page.dart';
 import 'package:front_nearby_caregiver/thema/palette.dart';
-import 'package:front_nearby_caregiver/provider/page_notifier.dart';
 
-import 'package:provider/provider.dart';
-
-class ChatPage extends StatefulWidget{
-  static final String pageName = 'Homepage';
+class ChattingPage extends Page{
+  static final String pageName = 'ChattingPage';
 
   @override
-  State<ChatPage> createState() => _ChatPageState();
+  Route createRoute(BuildContext context) {
+    return MaterialPageRoute(settings:this, builder: (context)=>ChattingWidget());
+  }
 }
 
-class _ChatPageState extends State<ChatPage> {
-  final GlobalKey<AnimatedListState> _animListKey = GlobalKey<
-      AnimatedListState>();
-  final TextEditingController _textEditingController = TextEditingController();
+class ChattingWidget extends StatefulWidget {
+  const ChattingWidget({Key? key}) : super(key: key);
+
+  @override
+  State<ChattingWidget> createState() => _ChattingWidgetState();
+}
+
+class _ChattingWidgetState extends State<ChattingWidget> {
+  GlobalKey<AnimatedListState> _animListKey = GlobalKey<AnimatedListState>();
+  TextEditingController _textEditingController = TextEditingController();
   List<String> _chats = [];
   String _text = ' ';
-
 
   @override
   void initState() {
@@ -32,12 +35,6 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         title: Text("벗",
             style: TextStyle(fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(icon: Icon(Icons.logout), onPressed: () {
-            Provider.of<PageNotifier>(context, listen: false)
-                .goToOtherPage(AuthPage.pageName);
-          })
-        ],
       ),
       body: Column(
         children: [

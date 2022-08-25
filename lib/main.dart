@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:front_nearby_caregiver/pages/add_calendar_page.dart';
 import 'package:front_nearby_caregiver/pages/auth_page.dart';
 import 'package:front_nearby_caregiver/pages/calendar_page.dart';
-import 'package:front_nearby_caregiver/pages/chat_page.dart';
+import 'package:front_nearby_caregiver/pages/chatting_page.dart';
 import 'package:front_nearby_caregiver/thema/palette.dart';
 import 'package:front_nearby_caregiver/provider/page_notifier.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,12 @@ class MyApp extends StatelessWidget {
                 MaterialPage(
                     key: ValueKey(AuthPage.pageName),
                     child: CalendarPage()),
-                if(pageNotifier.currentPage == AuthPage.pageName)  AuthPage(),
+                if(pageNotifier.currentPage == AuthPage.pageName)
+                  AuthPage(),
+                if(pageNotifier.currentPage == ChattingPage.pageName)
+                  ChattingPage(),
+                if(pageNotifier.currentPage == AddCalendarPage.pageName)
+                  AddCalendarPage(),
               ],
               onPopPage: (route, result){
                 if(!route.didPop(result)){

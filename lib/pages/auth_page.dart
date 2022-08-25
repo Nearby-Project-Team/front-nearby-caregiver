@@ -28,9 +28,10 @@ class _AuthWidgetState extends State<AuthWidget> {
 
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   TextEditingController _caregiverEmailController = TextEditingController();
-  TextEditingController _elderlyNameController = TextEditingController();
+  TextEditingController _caregiverPasswordController = TextEditingController();
 
   static final double _cornerRadius = 3.0;
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -67,9 +68,9 @@ class _AuthWidgetState extends State<AuthWidget> {
                           ),
                         ),
                         SizedBox(height: 16),
-                        _buildTextFormField("보호자 이메일", _caregiverEmailController),
+                        _buildTextFormField("이메일", _caregiverEmailController),
                         SizedBox(height: 8),
-                        _buildTextFormField("본인 이름", _elderlyNameController),
+                        _buildTextFormField("비밀번호", _caregiverPasswordController),
                         SizedBox(height: 16),
                         TextButton(
                           onPressed: () {
