@@ -56,25 +56,36 @@ class _ChattingWidgetState extends State<ChattingWidget> {
   Container inputSendContainer() {
     return Container( // 입력창 & 전송버튼
       padding: EdgeInsets.symmetric(horizontal: 8.0),
-      child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _textEditingController,
-                decoration: InputDecoration(hintText: "메시지 입력창"),
-                onSubmitted: _handleSubmitted,
-              ),
-            ),
-            const SizedBox(
-              width: 0.8,
-            ),
-            IconButton(onPressed: () {
-              _handleSubmitted(_textEditingController.text);
-            },
-              icon: Icon(Icons.send),
-              color: Palette.newBlue,
-            ),
-          ]
+      child: Column(
+        children: [
+          Row(
+              children: [
+                const SizedBox(
+                  width: 8,
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: _textEditingController,
+                    decoration: InputDecoration(
+                        hintText: "메시지 입력창",
+                        border: InputBorder.none,
+                    ),
+                    onSubmitted: _handleSubmitted,
+                  ),
+                ),
+                const SizedBox(
+                  width: 0.8,
+                ),
+                IconButton(onPressed: () {
+                  _handleSubmitted(_textEditingController.text);
+                },
+                  icon: Icon(Icons.send),
+                  color: Palette.newBlue,
+                ),
+              ]
+          ),
+          const SizedBox(height: 16),
+        ],
       ),
     );
   }

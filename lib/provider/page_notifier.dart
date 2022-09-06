@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:front_nearby_caregiver/pages/auth_page.dart';
-import 'package:front_nearby_caregiver/pages/chatting_page.dart';
 import 'package:front_nearby_caregiver/pages/calendar_page.dart';
 import 'package:intl/intl.dart';
 
 class PageNotifier extends ChangeNotifier{
-  String _currentPage = CalendarPage.pageName;
+  String _currentPage = AuthPage.pageName;
   String get currentPage => _currentPage;
 
   void goToMain()

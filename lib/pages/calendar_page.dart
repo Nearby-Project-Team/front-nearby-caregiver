@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_clean_calendar/flutter_clean_calendar.dart';
 import 'package:front_nearby_caregiver/pages/add_calendar_page.dart';
+import 'package:front_nearby_caregiver/pages/record_page.dart';
 import 'package:front_nearby_caregiver/thema/palette.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -129,7 +130,10 @@ class _CalendarPageState extends State<CalendarPage> {
                       borderRadius: BorderRadius.circular(_cornerRadius)
                   ),// NEW
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Provider.of<PageNotifier>(context, listen: false)
+                      .goToOtherPage(RecordPage.pageName);
+                },
                 child: const Text(
                   '대화내용확인',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
