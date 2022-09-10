@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:front_nearby_caregiver/pages/calendar_page.dart';
+import 'package:front_nearby_caregiver/pages/auth/permission_record_page.dart';
+import 'package:front_nearby_caregiver/pages/auth/record_page.dart';
+import 'package:front_nearby_caregiver/pages/calendar/calendar_page.dart';
+import 'package:front_nearby_caregiver/pages/home_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:front_nearby_caregiver/thema/palette.dart';
 
-import '../provider/page_notifier.dart';
+import '../../provider/page_notifier.dart';
 
 class AuthPage extends Page{
 
@@ -96,7 +99,7 @@ class _AuthWidgetState extends State<AuthWidget> {
                               color: Colors.white,)),
                       ],
                     ),
-                    SizedBox(height: 100),
+                    SizedBox(height: 70),
                     ButtonBar(
                       children: [
                         TextButton(
@@ -147,12 +150,15 @@ class _AuthWidgetState extends State<AuthWidget> {
                     SizedBox(height: 16),
                     TextButton(
                       onPressed: () {
-                        // TODO: 로그인 분기 나눠야 함.
                         if(_formkey.currentState!.validate())
                         {
-                          // permission();
-                          Provider.of<PageNotifier>(context, listen: false)
-                              .goToOtherPage(CalendarPage.pageName);
+                          isRegister ? {
+                            Provider.of<PageNotifier>(context, listen: false)
+                                .goToOtherPage(PermissionRecordPage.pageName)
+                          }:{
+                            Provider.of<PageNotifier>(context, listen: false)
+                                .goToOtherPage(HomePage.pageName)
+                          };
                         }
                       },
                       style: TextButton.styleFrom(
@@ -182,10 +188,15 @@ class _AuthWidgetState extends State<AuthWidget> {
     return TextFormField(
         controller: controller,
         validator: (text){
-          if(text == null || text.isEmpty)
+          if((text == null || text.isEmpty) && isRegister)
           {
             return "입력창이 비어있어요!";
           }
+          else if(text == null || text.isEmpty && (controller != _caregiverNameController))
+          {
+            return "입력창이 비어있어요!";
+          }
+
           return null;
         },
         style: TextStyle(

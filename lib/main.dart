@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:front_nearby_caregiver/pages/add_calendar_page.dart';
-import 'package:front_nearby_caregiver/pages/auth_page.dart';
-import 'package:front_nearby_caregiver/pages/calendar_page.dart';
-import 'package:front_nearby_caregiver/pages/chatting_page.dart';
-import 'package:front_nearby_caregiver/pages/record_page.dart';
+import 'package:front_nearby_caregiver/pages/auth/permission_record_page.dart';
+import 'package:front_nearby_caregiver/pages/auth/register_oa_page.dart';
+import 'package:front_nearby_caregiver/pages/calendar/add_calendar_page.dart';
+import 'package:front_nearby_caregiver/pages/auth/auth_page.dart';
+import 'package:front_nearby_caregiver/pages/calendar/calendar_page.dart';
+import 'package:front_nearby_caregiver/pages/chatting/chatting_page.dart';
+import 'package:front_nearby_caregiver/pages/auth/record_page.dart';
+import 'package:front_nearby_caregiver/pages/home_page.dart';
 import 'package:front_nearby_caregiver/thema/palette.dart';
 import 'package:front_nearby_caregiver/provider/page_notifier.dart';
 import 'package:provider/provider.dart';
@@ -33,8 +36,10 @@ class MyApp extends StatelessWidget {
             return Navigator(
               pages:[
                 MaterialPage(
-                    key: ValueKey(AuthPage.pageName),
-                    child: CalendarPage()),
+                    key: ValueKey(HomePage.pageName),
+                    child: HomePage()),
+                if(pageNotifier.currentPage == CalendarPage.pageName)
+                  CalendarPage(),
                 if(pageNotifier.currentPage == AuthPage.pageName)
                   AuthPage(),
                 if(pageNotifier.currentPage == ChattingPage.pageName)
@@ -43,6 +48,10 @@ class MyApp extends StatelessWidget {
                   AddCalendarPage(),
                 if(pageNotifier.currentPage == RecordPage.pageName)
                   RecordPage(),
+                if(pageNotifier.currentPage == PermissionRecordPage.pageName)
+                  PermissionRecordPage(),
+                if(pageNotifier.currentPage == RegisterOAPage.pageName)
+                  RegisterOAPage(),
               ],
               onPopPage: (route, result){
                 if(!route.didPop(result)){
