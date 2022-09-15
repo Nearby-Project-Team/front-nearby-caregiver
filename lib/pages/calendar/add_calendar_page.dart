@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_nearby_caregiver/api/calendar/setCalendar.dart';
 import 'package:front_nearby_caregiver/pages/calendar/calendar_page.dart';
 import 'package:front_nearby_caregiver/provider/page_notifier.dart';
 import 'package:logger/logger.dart';
@@ -27,6 +28,7 @@ class _AddCalendarWidgetState extends State<AddCalendarWidget> {
   TextEditingController _calendarName = TextEditingController();
   late String _selectedStartTime = '${TimeOfDay.now().hour}:00';
   late String _selectedEndTime = '${TimeOfDay.now().hour+1}:00';
+  var _setDate;
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +114,10 @@ class _AddCalendarWidgetState extends State<AddCalendarWidget> {
                             setState((){
                               _selectedStartTime = '${time?.hour}:${time?.minute}';
                               _selectedEndTime = '${time?.hour}:${time?.minute}';
+                              var day = DateTime.parse(context.read<PageNotifier>().selectedDate);
+                              int? hour = time?.hour;
+                              int? minute = time?.minute;
+                              _setDate = DateTime(day.year, day.month, day.day, hour!, minute!);
                             })
                           });
                         },
@@ -124,50 +130,6 @@ class _AddCalendarWidgetState extends State<AddCalendarWidget> {
                         ))
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Text("마침시간",
-                          style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Text("$_selectedEndTime",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    OutlinedButton(
-                        onPressed: (){
-                          Future<TimeOfDay?> selected = showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.now()
-                          );
-                          selected.then((time) => {
-                            setState((){
-                              _selectedEndTime = '${time?.hour}:${time?.minute}';
-                            })
-                          });
-                        },
-                        child: Text('시간설정',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Palette.newBlue,
-                          ),
-                        )
-                    )
-                  ],
-                ),
                 const SizedBox(
                   height: 15,
                 ),
@@ -176,6 +138,10 @@ class _AddCalendarWidgetState extends State<AddCalendarWidget> {
                     if(_formkey.currentState!.validate())
                     {
                       // permission();
+                      setCalendar(
+                          context.read<PageNotifier>().selectedElderly.elderlyId,
+                          _setDate,
+                          _calendarName.text);
                       Provider.of<PageNotifier>(context, listen: false)
                           .goToOtherPage(CalendarPage.pageName);
                     }

@@ -11,6 +11,8 @@ import 'package:front_nearby_caregiver/thema/palette.dart';
 import 'package:front_nearby_caregiver/provider/page_notifier.dart';
 import 'package:provider/provider.dart';
 
+import 'api/init.dart';
+
 void main() {
   runApp(MyApp());
 }

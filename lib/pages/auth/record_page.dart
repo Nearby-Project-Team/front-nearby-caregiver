@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:front_nearby_caregiver/data/script_caregiver.dart';
 import 'package:front_nearby_caregiver/thema/palette.dart';
@@ -8,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
+import '../../api/auth/uploadVoiceFile.dart';
 import '../../provider/page_notifier.dart';
 import '../home_page.dart';
 
@@ -30,6 +32,9 @@ class RecordWidget extends StatefulWidget {
 class _RecordWidgetState extends State<RecordWidget> {
   int index = 0;
   String viewTxt = " ";
+  String userInfo = "";
+  static final storage = new FlutterSecureStorage();
+
 
   FlutterSoundRecorder? myRecorder;
   FlutterSoundPlayer? myPlayer;
@@ -45,7 +50,16 @@ class _RecordWidgetState extends State<RecordWidget> {
       myRecorder = (await FlutterSoundRecorder().openAudioSession())!;
       myPlayer = (await FlutterSoundPlayer().openAudioSession())!;
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      _asyncMethod();
+    });
+
     super.initState();
+  }
+
+  _asyncMethod() async {
+    userInfo = (await storage.read(key: "login"))!;
   }
 
   @override
@@ -129,9 +143,10 @@ class _RecordWidgetState extends State<RecordWidget> {
                         finalCheck = !finalCheck;
                       }
                       else {
+                        sendMyFile();
                         index++;
-                        playCheck = !playCheck;
                         viewTxt = scriptCaregiver[index];
+                        playCheck = !playCheck;
                       }
                     })
                   };
@@ -171,65 +186,60 @@ class _RecordWidgetState extends State<RecordWidget> {
   Future<void> _recodeFunc() async{
     PermissionStatus status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) throw RecordingPermissionException("Microphone permission not granted");
-    if(!check){
+
+    if (!check)
+    {
       Directory tempDir = await getTemporaryDirectory();
-      File outputFile = File('${tempDir.path}/flutter_sound-tmp-$index.mp4');
-      await myRecorder?.startRecorder(toFile: outputFile.path,codec: Codec.aacMP4);
-      print("START");
+      File outputFile = File('${tempDir.path}/flutter_sound-tmp-$index.pcm');
+      await myRecorder?.startRecorder(
+        codec: Codec.pcm16,
+        toFile: outputFile.path,
+        sampleRate: 16000,
+        numChannels: 1,
+      );
+
       setState(() {
+        if(index == 0)
+          {
+            index++;
+            viewTxt = scriptCaregiver[index];
+            playCheck = !playCheck;
+          }
         check = !check;
       });
       return;
     }
-    print("STOP");
+
+
     setState(() {
       check = !check;
       playCheck = true;
       // viewTxt = "await...";
     });
+
     await myRecorder?.stopRecorder()
         .then((value) => {
           setState((){
             // viewTxt = "Check";
           })
     });
+
     return;
   }
 
-  // Future<void> playMyFile() async{
-  //   if(!playCheck){
-  //     Directory tempDir = await getTemporaryDirectory();
-  //     File inFile = File('${tempDir.path}/flutter_sound-tmp.mp4');
-  //     try{
-  //       Uint8List dataBuffer = await inFile.readAsBytes();
-  //       print("dataBuffer $dataBuffer");
-  //       setState(() {
-  //         playCheck = !playCheck;
-  //       });
-  //       await this.myPlayer?.startPlayer(
-  //           fromDataBuffer: dataBuffer,
-  //           codec: Codec.aacMP4,
-  //           whenFinished: () {
-  //             print('Play finished');
-  //             setState(() {});
-  //           });
-  //     }
-  //     catch(e){
-  //       print("NO Data");
-  //       _key.currentState?.showSnackBar(
-  //           SnackBar(
-  //             content: Text("NO DATA!!!!!!"),
-  //           )
-  //       );
-  //     }
-  //     return;
-  //   }
-  //   await myPlayer?.stopPlayer();
-  //   setState(() {
-  //     playCheck = !playCheck;
-  //   });
-  //   print("PLAY STOP!!");
-  //   return;
-  // }
 
+  Future<void> sendMyFile() async{
+    if(playCheck){
+      Directory tempDir = await getTemporaryDirectory();
+      File inFile = File('${tempDir.path}/flutter_sound-tmp-${index}.pcm');
+      await uploadVoiceFile(
+          inFile,
+          '${index-1}.pcm',
+          userInfo.split(" ")[1],
+          userInfo.split(" ")[3]
+      );
+      return;
+    }
+    return;
+  }
 }

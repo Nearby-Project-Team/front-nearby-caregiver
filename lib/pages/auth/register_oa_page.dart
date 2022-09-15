@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:front_nearby_caregiver/api/auth/login.dart';
+import 'package:front_nearby_caregiver/api/elderly/getOAList.dart';
+import 'package:front_nearby_caregiver/api/init.dart';
+import 'package:front_nearby_caregiver/pages/home_page.dart';
+import 'package:provider/provider.dart';
+import '../../api/elderly/registerOA.dart';
+import '../../data/user.dart';
+import '../../provider/page_notifier.dart';
 import '../../thema/palette.dart';
 
 class RegisterOAPage extends Page{
@@ -18,10 +27,18 @@ class RegisterOAWidget extends StatefulWidget {
 }
 
 class _RegisterOAWidgetState extends State<RegisterOAWidget> {
-  final _formkeyOA = GlobalKey<FormState>();
-  final TextEditingController _oaNameController = TextEditingController();
-  final TextEditingController _oaBirthDayController = TextEditingController();
-  final TextEditingController _oaPhoneNumberController = TextEditingController();
+  GlobalKey<FormState> _formkeyOA = GlobalKey<FormState>();
+  TextEditingController _oaNameController = TextEditingController();
+  TextEditingController _oaBirthDayController = TextEditingController();
+  TextEditingController _oaPhoneNumberController = TextEditingController();
+
+  String userInfo = "";
+  static final storage = new FlutterSecureStorage();
+
+  @override
+  void initState(){
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,46 +53,58 @@ class _RegisterOAWidgetState extends State<RegisterOAWidget> {
           color: Palette.newBlue,
           child: Scaffold(
             body: SafeArea(
-              key: this._formkeyOA,
-              child: ListView(
-                padding: EdgeInsets.all(16),
-                children: [
-                  SizedBox(height: 8),
-                  _buildTextFormField(
-                      "어르신 이름",
-                      _oaNameController
-                  ),
-                  SizedBox(height: 8),
-                  _buildTextFormField(
-                      "어르신 생년월일 (예: 1900-01-01)",
-                      _oaBirthDayController
-                  ),
-                  SizedBox(height: 8),
-                  _buildTextFormField(
-                      "어르신 전화번호 (예: 01012345678)",
-                      _oaPhoneNumberController
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Palette.newBlue,
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5.0)
-                      ),
-                      padding: EdgeInsets.all(16),
-                      textStyle: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),// NEW
+              child: Form(
+                key: _formkeyOA,
+                child: ListView(
+                  padding: EdgeInsets.all(16),
+                  children: [
+                    SizedBox(height: 8),
+                    _buildTextFormField(
+                        "어르신 이름",
+                        _oaNameController
                     ),
-                    onPressed: (){
-                      Navigator.pop(context);
-                    },
-                    child: Text("등록하기"),
-                  )
-                ],
+                    SizedBox(height: 8),
+                    _buildTextFormField(
+                        "어르신 생년월일 (예: 1900-01-01)",
+                        _oaBirthDayController
+                    ),
+                    SizedBox(height: 8),
+                    _buildTextFormField(
+                        "어르신 전화번호 (예: 01012345678)",
+                        _oaPhoneNumberController
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Palette.newBlue,
+                        minimumSize: const Size.fromHeight(50),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)
+                        ),
+                        padding: EdgeInsets.all(16),
+                        textStyle: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),// NEW
+                      ),
+                      onPressed: (){
+                        if(_formkeyOA.currentState!.validate())
+                          {
+                            registerOA(getUserEmail(),
+                                _oaNameController.text,
+                                _oaBirthDayController.text,
+                                _oaPhoneNumberController.text);
+                            Provider.of<PageNotifier>(context, listen: false)
+                                .goToOtherPage(HomePage.pageName);
+                            Provider.of<PageNotifier>(context, listen: false)
+                                .setList(getElderlyList() as List<UserOA>);
+                          }
+                      },
+                      child: Text("등록하기"),
+                    )
+                  ],
+                ),
               )
             ),
           ),

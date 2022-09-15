@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:front_nearby_caregiver/api/auth/register.dart';
+import 'package:front_nearby_caregiver/api/init.dart';
 import 'package:front_nearby_caregiver/pages/auth/permission_record_page.dart';
-import 'package:front_nearby_caregiver/pages/auth/record_page.dart';
-import 'package:front_nearby_caregiver/pages/calendar/calendar_page.dart';
 import 'package:front_nearby_caregiver/pages/home_page.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:front_nearby_caregiver/thema/palette.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../api/auth/login.dart';
+import '../../data/user.dart';
 import '../../provider/page_notifier.dart';
 
 class AuthPage extends Page{
@@ -33,12 +35,38 @@ class _AuthWidgetState extends State<AuthWidget> {
   TextEditingController _caregiverEmailController = TextEditingController();
   TextEditingController _caregiverPasswordController = TextEditingController();
   TextEditingController _caregiverNameController = TextEditingController();
+  TextEditingController _caregiverPhoneNumberController = TextEditingController();
 
   bool isRegister = false;
   Duration _duration = Duration(milliseconds: 300);
   Curve _curve = Curves.fastOutSlowIn;
 
   static final double _cornerRadius = 3.0;
+
+  String userInfo = "";
+  static final storage = new FlutterSecureStorage();
+
+  @override
+  void initState(){
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      _asyncMethod();
+    });
+  }
+
+  _asyncMethod() async {
+    userInfo = (await storage.read(key: "login"))!;
+
+    if(userInfo != null)
+      {
+        loginUser(userInfo.split(" ")[1], userInfo.split(" ")[3]);
+        Provider.of<PageNotifier>(context, listen: false)
+            .goToOtherPage(HomePage.pageName);
+        Provider.of<PageNotifier>(context, listen: false)
+            .setList(getElderlyList() as List<UserOA>);
+      }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +127,7 @@ class _AuthWidgetState extends State<AuthWidget> {
                               color: Colors.white,)),
                       ],
                     ),
-                    SizedBox(height: 70),
+                    SizedBox(height: 50),
                     ButtonBar(
                       children: [
                         TextButton(
@@ -144,21 +172,52 @@ class _AuthWidgetState extends State<AuthWidget> {
                     AnimatedContainer(
                         duration: _duration,
                         curve: _curve,
-                        height: isRegister ? 60 : 0,
-                        child: _buildTextFormField(
-                            "이름", _caregiverNameController)),
-                    SizedBox(height: 16),
+                        height: isRegister ? 150 : 0,
+                        child: Column(
+                          children: [
+                            _buildTextFormField(
+                                "이름", _caregiverNameController),
+                            SizedBox(height: 8),
+                            _buildTextFormField(
+                                "전화번호", _caregiverPhoneNumberController)
+                          ],
+                        )),
+                    SizedBox(height: 8),
                     TextButton(
                       onPressed: () {
                         if(_formkey.currentState!.validate())
                         {
-                          isRegister ? {
-                            Provider.of<PageNotifier>(context, listen: false)
-                                .goToOtherPage(PermissionRecordPage.pageName)
-                          }:{
-                            Provider.of<PageNotifier>(context, listen: false)
-                                .goToOtherPage(HomePage.pageName)
-                          };
+                          if(isRegister)
+                            {
+                              registerUser(
+                                  _caregiverEmailController.text,
+                                  _caregiverPasswordController.text,
+                                  _caregiverNameController.text,
+                                  _caregiverPhoneNumberController.text
+                              );
+                              storage.write(
+                                  key: "login",
+                                  value: "email ${_caregiverEmailController.text} password ${_caregiverPasswordController.text}"
+                              );
+                              Provider.of<PageNotifier>(context, listen: false)
+                                  .goToOtherPage(PermissionRecordPage.pageName);
+                            }
+                          else
+                            {
+                              loginUser(_caregiverEmailController.text, _caregiverPasswordController.text);
+                              if(getUserID() == "200")
+                                {
+                                  storage.write(
+                                    key: "login",
+                                    value: "email ${_caregiverEmailController.text} password ${_caregiverPasswordController.text}"
+                                  );
+
+                                  Provider.of<PageNotifier>(context, listen: false)
+                                      .goToOtherPage(HomePage.pageName);
+                                  Provider.of<PageNotifier>(context, listen: false)
+                                      .setList(getElderlyList() as List<UserOA>);
+                                }
+                            }
                         }
                       },
                       style: TextButton.styleFrom(
@@ -174,7 +233,7 @@ class _AuthWidgetState extends State<AuthWidget> {
                       child: Text(
                         isRegister ? "회원가입" : "로그인",
                       ),),
-                    SizedBox(height: 50),
+                    SizedBox(height: 30),
                   ].reversed.toList(),
                 ),
               ),
@@ -192,7 +251,9 @@ class _AuthWidgetState extends State<AuthWidget> {
           {
             return "입력창이 비어있어요!";
           }
-          else if(text == null || text.isEmpty && (controller != _caregiverNameController))
+          else if(text == null || text.isEmpty
+              && (controller != _caregiverNameController)
+              && (controller != _caregiverPhoneNumberController))
           {
             return "입력창이 비어있어요!";
           }
@@ -225,15 +286,3 @@ class _AuthWidgetState extends State<AuthWidget> {
     );
   }
 }
-
-
-// Future<bool> permission() async {
-//   Map<Permission, PermissionStatus> status =
-//   await [Permission.speech].request(); // [] 권한배열에 권한을 작성
-//
-//   if (await Permission.speech.isGranted) {
-//     return Future.value(true);
-//   } else {
-//     return Future.value(false);
-//   }
-// }
