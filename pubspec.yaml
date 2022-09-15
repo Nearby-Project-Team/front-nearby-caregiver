@@ -1,5 +1,5 @@
 name: front_nearby_caregiver
-description: A Flutter project of nearby for caregiver
+description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -34,6 +34,21 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  logger: ^1.1.0
+  provider: ^6.0.3
+  avatar_glow: ^2.0.2
+  permission_handler: ^10.0.0
+  flutter_native_splash: ^2.2.6
+  flutter_clean_calendar: ^1.1.0
+  flutter_sound: ^8.1.9
+  assets_audio_player: ^3.0.3+3
+  table_calendar: ^3.0.7
+  path_provider: ^2.0.11
+  http: ^0.13.5
+  flutter_secure_storage: ^6.0.0
+  intl: ^0.17.0
+  file_picker: ^5.0.1
+  dio: ^4.0.6
 
 dev_dependencies:
   flutter_test:
@@ -58,8 +73,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/logo-noback.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

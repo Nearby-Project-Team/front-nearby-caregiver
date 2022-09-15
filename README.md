@@ -1,6 +1,6 @@
 # front_nearby_caregiver
 
-A Flutter project of nearby for caregiver
+A new Flutter project.
 
 ## Getting Started
 
